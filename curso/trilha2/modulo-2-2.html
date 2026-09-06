@@ -230,6 +230,17 @@
     .qz-opt[data-state="no"] { border-color: #ef4444; background: rgba(239,68,68,.12); }
     .qz-fb { display:none; } .qz[data-answered] .qz-fb { display:block; }
 
+    /* TOC do módulo é um bloco inline, não uma barra lateral sticky */
+    [data-inema-toc] { position: static !important; top: auto !important; max-height: none !important; }
+    /* Painel de aparência (classes internas) */
+    .inema-appearance-sec { margin-bottom: .75rem; }
+    .inema-appearance-label { font-size: .7rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #9ca3af; margin-bottom: .35rem; }
+    .inema-appearance-row { display: flex; flex-wrap: wrap; gap: .35rem; }
+    .inema-chip { font-size: .8rem; padding: .3rem .65rem; border-radius: .5rem; border: 1px solid #374151; background: rgba(31,41,55,.6); color: #e5e7eb; cursor: pointer; }
+    .inema-chip:hover { border-color: #FACC15; }
+    .inema-chip[aria-pressed="true"], .inema-chip.is-active { background: rgba(250,204,21,.15); border-color: #FACC15; color: #FACC15; }
+    html:not(.dark) .inema-chip { background: #f3f4f6; color: #111827; border-color: #d1d5db; }
+    html:not(.dark) .inema-chip[aria-pressed="true"], html:not(.dark) .inema-chip.is-active { background: rgba(161,98,7,.1); border-color: #a16207; color: #a16207; }
     /* Code box */
     .codebox pre { white-space: pre-wrap; word-break: break-word; }
     
@@ -622,7 +633,7 @@ Existe alguma skill ou plugin que melhoraria de verdade esse fluxo? Se existir, 
         <table class="w-full text-sm text-left">
           <caption class="text-left text-xs text-neutral-500 px-4 pt-3">Cabeçalho da ficha consolidada: superfície, plano, modelo, data.</caption>
           <thead class="bg-dark-800 text-blue-400"><tr><th class="px-4 py-3 font-semibold">Teste</th><th class="px-4 py-3 font-semibold">Grupo de ferramentas</th><th class="px-4 py-3 font-semibold">Resultado</th><th class="px-4 py-3 font-semibold">Uma frase</th></tr></thead>
-          <tbody class="divide-y divide-dark-600"><tr class="bg-dark-900/40"><td class="px-4 py-3 font-semibold text-neutral-100">1. Continuidade</td><td class="px-4 py-3 text-neutral-300">Memória (6)</td><td class="px-4 py-3 text-neutral-300"><passou / parcial / falhou></td><td class="px-4 py-3 text-neutral-300"><o que viu></td></tr><tr class="bg-dark-900/40"><td class="px-4 py-3 font-semibold text-neutral-100">2. Registro</td><td class="px-4 py-3 text-neutral-300">Conversas passadas (3)</td><td class="px-4 py-3 text-neutral-300"><passou / parcial / falhou></td><td class="px-4 py-3 text-neutral-300"><o que viu></td></tr><tr class="bg-dark-900/40"><td class="px-4 py-3 font-semibold text-neutral-100">3. Interface</td><td class="px-4 py-3 text-neutral-300">Respostas visuais (13)</td><td class="px-4 py-3 text-neutral-300"><passou / parcial / não disponível></td><td class="px-4 py-3 text-neutral-300"><o que viu></td></tr><tr class="bg-dark-900/40"><td class="px-4 py-3 font-semibold text-neutral-100">4. Capacidade</td><td class="px-4 py-3 text-neutral-300">Plugins + skills (4)</td><td class="px-4 py-3 text-neutral-300"><passou / parcial / falhou></td><td class="px-4 py-3 text-neutral-300"><o que viu></td></tr><tr class="bg-dark-900/40"><td class="px-4 py-3 font-semibold text-neutral-100">5. Controle</td><td class="px-4 py-3 text-neutral-300">Memória + configurações</td><td class="px-4 py-3 text-neutral-300"><passou / parcial / falhou></td><td class="px-4 py-3 text-neutral-300"><o que viu></td></tr></tbody>
+          <tbody class="divide-y divide-dark-600"><tr class="bg-dark-900/40"><td class="px-4 py-3 font-semibold text-neutral-100">1. Continuidade</td><td class="px-4 py-3 text-neutral-300">Memória (6)</td><td class="px-4 py-3 text-neutral-300">[passou / parcial / falhou]</td><td class="px-4 py-3 text-neutral-300">[o que viu]</td></tr><tr class="bg-dark-900/40"><td class="px-4 py-3 font-semibold text-neutral-100">2. Registro</td><td class="px-4 py-3 text-neutral-300">Conversas passadas (3)</td><td class="px-4 py-3 text-neutral-300">[passou / parcial / falhou]</td><td class="px-4 py-3 text-neutral-300">[o que viu]</td></tr><tr class="bg-dark-900/40"><td class="px-4 py-3 font-semibold text-neutral-100">3. Interface</td><td class="px-4 py-3 text-neutral-300">Respostas visuais (13)</td><td class="px-4 py-3 text-neutral-300">[passou / parcial / não disponível]</td><td class="px-4 py-3 text-neutral-300">[o que viu]</td></tr><tr class="bg-dark-900/40"><td class="px-4 py-3 font-semibold text-neutral-100">4. Capacidade</td><td class="px-4 py-3 text-neutral-300">Plugins + skills (4)</td><td class="px-4 py-3 text-neutral-300">[passou / parcial / falhou]</td><td class="px-4 py-3 text-neutral-300">[o que viu]</td></tr><tr class="bg-dark-900/40"><td class="px-4 py-3 font-semibold text-neutral-100">5. Controle</td><td class="px-4 py-3 text-neutral-300">Memória + configurações</td><td class="px-4 py-3 text-neutral-300">[passou / parcial / falhou]</td><td class="px-4 py-3 text-neutral-300">[o que viu]</td></tr></tbody>
         </table>
       </div>
 

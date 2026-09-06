@@ -225,11 +225,11 @@ Existe alguma skill ou plugin que melhoraria de verdade esse fluxo? Se existir, 
           body: (t) => [
             c.p('Você tem cinco fichas. Agora consolide numa tabela só. Este é o resultado que vale: <strong class="text-blue-400">o produto na sua conta, nas suas condições, na sua data</strong>.'),
             c.table(t, { headers: ['Teste', 'Grupo de ferramentas', 'Resultado', 'Uma frase'], rows: [
-              ['1. Continuidade', 'Memória (6)', '<passou / parcial / falhou>', '<o que viu>'],
-              ['2. Registro', 'Conversas passadas (3)', '<passou / parcial / falhou>', '<o que viu>'],
-              ['3. Interface', 'Respostas visuais (13)', '<passou / parcial / não disponível>', '<o que viu>'],
-              ['4. Capacidade', 'Plugins + skills (4)', '<passou / parcial / falhou>', '<o que viu>'],
-              ['5. Controle', 'Memória + configurações', '<passou / parcial / falhou>', '<o que viu>'],
+              ['1. Continuidade', 'Memória (6)', '[passou / parcial / falhou]', '[o que viu]'],
+              ['2. Registro', 'Conversas passadas (3)', '[passou / parcial / falhou]', '[o que viu]'],
+              ['3. Interface', 'Respostas visuais (13)', '[passou / parcial / não disponível]', '[o que viu]'],
+              ['4. Capacidade', 'Plugins + skills (4)', '[passou / parcial / falhou]', '[o que viu]'],
+              ['5. Controle', 'Memória + configurações', '[passou / parcial / falhou]', '[o que viu]'],
             ], caption: 'Cabeçalho da ficha consolidada: superfície, plano, modelo, data.' }),
             c.code(t, { objective: 'Modelo de veredito final (uma frase, com contexto)', lang: 'text', code: `Veredito — Fable 5.1 no <web / celular / Claude Code>, plano <X>, em <data>:
 <passou N de 5>. Memória e registro funcionaram; visual não disponível neste plano; controle funcionou pela interface e falhou pela conversa.
