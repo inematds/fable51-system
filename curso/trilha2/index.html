@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="inema-course" content="fable51">
+  <title>Trilha 2 — Na prática | Fable 5.1 na prática</title>
+  <meta name="description" content="Rodar os cinco testes na sua própria conta, escrever prompts do jeito novo e registrar o que viu.">
+
+  <!-- ANTI-FOUC: bloqueante, antes de tudo -->
+  <script>
+(function () {
+  try {
+    var html = document.documentElement;
+    var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+    function clone(o) { var r = {}; for (var x in o) r[x] = o[x]; return r; }
+    var p = clone(DEF);
+    try {
+      var raw = localStorage.getItem('inema.prefs');
+      if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed === 'object') { for (var k in DEF) if (parsed[k] != null) p[k] = parsed[k]; } }
+      else { var legacy = localStorage.getItem('theme'); if (legacy === 'light') p.theme = 'claro'; else if (legacy === 'dark') p.theme = 'inema-dark'; }
+    } catch (e) { p = clone(DEF); }
+    var THEMES = { 'inema-dark': { dark: true, attr: null, cs: 'dark' }, 'claro': { dark: false, attr: null, cs: 'light' }, 'sepia': { dark: false, attr: 'sepia', cs: 'light' }, 'foco': { dark: null, attr: 'foco', cs: null }, 'contraste': { dark: true, attr: 'contraste', cs: 'dark' } };
+    var t = THEMES[p.theme] || THEMES['inema-dark'];
+    if (t.dark === true) html.classList.add('dark'); else if (t.dark === false) html.classList.remove('dark');
+    if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+    html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark') ? 'dark' : 'light'));
+    html.setAttribute('data-font', p.font || 'inter'); html.setAttribute('data-accent', p.accent || 'emerald');
+    var s = html.style; var scale = (+p.fontScale || 100);
+    s.setProperty('--inema-font-scale', (scale / 100).toString()); s.setProperty('font-size', scale + '%');
+    s.setProperty('--measure', (+p.lineWidth || 68) + 'ch'); s.setProperty('--lh-body', (+p.leading || 1.7).toString());
+    var fam = p.font === 'system' ? 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif' : (p.font === 'leitura' ? '"Atkinson Hyperlegible", "Inter", system-ui, sans-serif' : '"Inter", system-ui, sans-serif');
+    s.setProperty('--font-body', fam);
+    var ACC = { emerald: [152, 76, 45], blue: [217, 91, 60], purple: [258, 90, 66], amber: [38, 92, 50], teal: [174, 72, 41], rose: [350, 89, 60] };
+    var a = ACC[p.accent] || ACC.emerald;
+    s.setProperty('--accent-h', a[0] + ''); s.setProperty('--accent-s', a[1] + '%'); s.setProperty('--accent-l', a[2] + '%');
+    s.setProperty('--accent', 'hsl(' + a[0] + ' ' + a[1] + '% ' + a[2] + '%)');
+  } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme = 'dark'; } catch (e) {} }
+})();
+</script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#FACC15', dark: { 900: '#111827', 800: '#1f2937', 700: '#374151', 600: '#4b5563' } } } } }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/learn.css">
+
+  <!-- Manifesto do curso (obrigatório em toda página) -->
+  <script type="application/json" data-inema-manifest>
+{
+ "course": "fable51",
+ "tracks": [
+  {
+   "n": "1",
+   "title": "O que mudou",
+   "modules": [
+    {
+     "id": "1-1",
+     "title": "Duas coisas chamadas \"prompt de sistema\"",
+     "topics": 6,
+     "href": "curso/trilha1/modulo-1-1.html"
+    },
+    {
+     "id": "1-2",
+     "title": "Claude é mais do que o modelo",
+     "topics": 6,
+     "href": "curso/trilha1/modulo-1-2.html"
+    },
+    {
+     "id": "1-3",
+     "title": "O paradoxo e as regras que vieram junto",
+     "topics": 6,
+     "href": "curso/trilha1/modulo-1-3.html"
+    }
+   ]
+  },
+  {
+   "n": "2",
+   "title": "Na prática",
+   "modules": [
+    {
+     "id": "2-1",
+     "title": "Preparar o terreno e testar a memória",
+     "topics": 6,
+     "href": "curso/trilha2/modulo-2-1.html"
+    },
+    {
+     "id": "2-2",
+     "title": "Registro, interface, capacidade e controle",
+     "topics": 6,
+     "href": "curso/trilha2/modulo-2-2.html"
+    },
+    {
+     "id": "2-3",
+     "title": "Escrever para o Fable e usar o Claude Code",
+     "topics": 6,
+     "href": "curso/trilha2/modulo-2-3.html"
+    }
+   ]
+  },
+  {
+   "n": "3",
+   "title": "Gastar menos",
+   "modules": [
+    {
+     "id": "3-1",
+     "title": "Preço por token contra preço por tarefa",
+     "topics": 6,
+     "href": "curso/trilha3/modulo-3-1.html"
+    },
+    {
+     "id": "3-2",
+     "title": "Esforço, falhas e a cauda",
+     "topics": 6,
+     "href": "curso/trilha3/modulo-3-2.html"
+    },
+    {
+     "id": "3-3",
+     "title": "Alavancas do 5.1 para quem usa a API",
+     "topics": 6,
+     "href": "curso/trilha3/modulo-3-3.html"
+    }
+   ]
+  }
+ ]
+}
+  </script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    html { scroll-behavior: smooth; }
+    [id] { scroll-margin-top: 5rem; }
+
+    /* Light mode overrides */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .bg-dark-800\/50, html:not(.dark) .bg-dark-800\/60, html:not(.dark) .bg-dark-900\/40, html:not(.dark) .bg-dark-900\/60 { background-color: #f3f4f6; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-white { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    
+    html:not(.dark) .text-emerald-400 { color: #059669; }
+    html:not(.dark) .bg-emerald-500\/20 { background-color: rgba(5, 150, 105, 0.12); }
+    html:not(.dark) .bg-emerald-500\/10 { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .bg-emerald-900\/20 { background-color: rgba(5, 150, 105, 0.07); }
+    html:not(.dark) .border-emerald-500\/30 { border-color: rgba(5, 150, 105, 0.25); }
+    html:not(.dark) .hover\:bg-emerald-500\/30:hover { background-color: rgba(5, 150, 105, 0.18); }
+    html:not(.dark) .hover\:text-emerald-400:hover { color: #059669; }
+    html:not(.dark) .hover\:bg-emerald-500\/10:hover { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-emerald-400 { color: #059669; }
+
+    html:not(.dark) .text-blue-400 { color: #2563eb; }
+    html:not(.dark) .bg-blue-500\/20 { background-color: rgba(37, 99, 235, 0.12); }
+    html:not(.dark) .bg-blue-500\/10 { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .bg-blue-900\/20 { background-color: rgba(37, 99, 235, 0.07); }
+    html:not(.dark) .border-blue-500\/30 { border-color: rgba(37, 99, 235, 0.25); }
+    html:not(.dark) .hover\:bg-blue-500\/30:hover { background-color: rgba(37, 99, 235, 0.18); }
+    html:not(.dark) .hover\:text-blue-400:hover { color: #2563eb; }
+    html:not(.dark) .hover\:bg-blue-500\/10:hover { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-blue-400 { color: #2563eb; }
+
+    html:not(.dark) .text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .bg-purple-500\/20 { background-color: rgba(124, 58, 237, 0.12); }
+    html:not(.dark) .bg-purple-500\/10 { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .bg-purple-900\/20 { background-color: rgba(124, 58, 237, 0.07); }
+    html:not(.dark) .border-purple-500\/30 { border-color: rgba(124, 58, 237, 0.25); }
+    html:not(.dark) .hover\:bg-purple-500\/30:hover { background-color: rgba(124, 58, 237, 0.18); }
+    html:not(.dark) .hover\:text-purple-400:hover { color: #7c3aed; }
+    html:not(.dark) .hover\:bg-purple-500\/10:hover { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-purple-400 { color: #7c3aed; }
+
+    html:not(.dark) .text-amber-400 { color: #92400e; }
+    html:not(.dark) .bg-amber-500\/20 { background-color: rgba(146, 64, 14, 0.12); }
+    html:not(.dark) .bg-amber-500\/10 { background-color: rgba(146, 64, 14, 0.08); }
+    html:not(.dark) .bg-amber-900\/20 { background-color: rgba(146, 64, 14, 0.07); }
+    html:not(.dark) .border-amber-500\/30 { border-color: rgba(146, 64, 14, 0.25); }
+    html:not(.dark) .hover\:bg-amber-500\/30:hover { background-color: rgba(146, 64, 14, 0.18); }
+    html:not(.dark) .hover\:text-amber-400:hover { color: #92400e; }
+    html:not(.dark) .hover\:bg-amber-500\/10:hover { background-color: rgba(146, 64, 14, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-amber-400 { color: #92400e; }
+
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .bg-red-500\/20 { background-color: rgba(185, 28, 28, 0.12); }
+    html:not(.dark) .bg-red-500\/10 { background-color: rgba(185, 28, 28, 0.08); }
+    html:not(.dark) .bg-red-900\/20 { background-color: rgba(185, 28, 28, 0.07); }
+    html:not(.dark) .border-red-500\/30 { border-color: rgba(185, 28, 28, 0.25); }
+    html:not(.dark) .hover\:bg-red-500\/30:hover { background-color: rgba(185, 28, 28, 0.18); }
+    html:not(.dark) .hover\:text-red-400:hover { color: #b91c1c; }
+    html:not(.dark) .hover\:bg-red-500\/10:hover { background-color: rgba(185, 28, 28, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-red-400 { color: #b91c1c; }
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161, 98, 7, 0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161, 98, 7, 0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255, 255, 255, 0.95); }
+    html:not(.dark) .text-amber-700 { color: #92400e; }
+
+    /* Dark mode - bordas suaves */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+
+    /* SVG */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    @keyframes wf-pulse { 0%,100% { opacity:.55 } 50% { opacity:1 } }
+    @keyframes wf-flow { to { stroke-dashoffset: -28; } }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s} .wf-a:nth-child(6){animation-delay:1.25s}
+      .wf-flow { stroke-dasharray: 6 8; animation: wf-flow 1.4s linear infinite; }
+    }
+
+    /* Quiz */
+    .qz-opt[data-state="ok"] { border-color: #10b981; background: rgba(16,185,129,.15); }
+    .qz-opt[data-state="no"] { border-color: #ef4444; background: rgba(239,68,68,.12); }
+    .qz-fb { display:none; } .qz[data-answered] .qz-fb { display:block; }
+
+    /* Code box */
+    .codebox pre { white-space: pre-wrap; word-break: break-word; }
+    
+  </style>
+</head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen">
+
+  <!-- NAVIGATION -->
+  <nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-14">
+        <div class="flex items-center space-x-3">
+          <a href="../../index.html" class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300">
+            <span class="text-2xl">⚡</span>
+            <span class="font-bold text-lg hidden md:inline">Fable 5.1</span>
+          </a>
+          <span class="text-neutral-600">|</span>
+          <a href="https://inema.club" target="_blank" class="text-sky-400 hover:text-sky-300 text-sm font-medium">INEMA.CLUB</a>
+          <span class="text-neutral-600 hidden sm:inline">-</span>
+          <a href="https://inema.pro" target="_blank" class="text-amber-700 dark:text-slate-300 hover:opacity-80 text-sm font-medium hidden sm:inline">PRO</a>
+        </div>
+        <div class="flex items-center space-x-1 sm:space-x-2">
+          <a href="../../curso/trilha1/index.html" class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors">
+            <span class="sm:hidden">T1</span>
+            <span class="hidden sm:inline">O que mudou</span>
+          </a>
+          <a href="../../curso/trilha2/index.html" class="px-3 py-1.5 rounded-lg text-sm font-semibold text-blue-400 bg-blue-500/10">
+            <span class="sm:hidden">T2</span>
+            <span class="hidden sm:inline">Na prática</span>
+          </a>
+          <a href="../../curso/trilha3/index.html" class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors">
+            <span class="sm:hidden">T3</span>
+            <span class="hidden sm:inline">Gastar menos</span>
+          </a>
+          <button type="button" data-inema-journey-open class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-primary bg-primary/10 hover:bg-primary/20 transition-colors">
+            <span>🧭</span><span>Minha jornada</span>
+            <span data-inema-journey-badge class="text-xs px-1.5 py-0.5 rounded-full bg-primary/20"></span>
+          </button>
+          <button type="button" data-inema-appearance-toggle="[data-inema-appearance]" aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" title="Aparência e leitura">
+            <span aria-hidden="true">Aa</span>
+          </button>
+          <button id="theme-toggle" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" title="Tema claro/escuro">
+            <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5 text-neutral-300" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+            <svg id="theme-toggle-light-icon" class="hidden w-5 h-5 text-neutral-300" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  <div data-inema-appearance class="inema-appearance-pop" role="region" aria-label="Aparência e leitura">
+    <div class="inema-appearance-sec">
+      <p class="inema-appearance-label">Tema</p>
+      <div class="inema-appearance-row">
+        <button type="button" data-inema-set-theme="inema-dark" class="inema-chip">Escuro</button>
+        <button type="button" data-inema-set-theme="claro" class="inema-chip">Claro</button>
+        <button type="button" data-inema-set-theme="sepia" class="inema-chip">Sépia</button>
+        <button type="button" data-inema-set-theme="foco" class="inema-chip">Foco</button>
+        <button type="button" data-inema-set-theme="contraste" class="inema-chip">Contraste</button>
+      </div>
+    </div>
+    <div class="inema-appearance-sec">
+      <p class="inema-appearance-label">Tamanho do texto</p>
+      <div class="inema-appearance-row">
+        <button type="button" data-inema-set-fontscale="90" class="inema-chip">A-</button>
+        <button type="button" data-inema-set-fontscale="100" class="inema-chip">A</button>
+        <button type="button" data-inema-set-fontscale="115" class="inema-chip">A+</button>
+        <button type="button" data-inema-set-fontscale="130" class="inema-chip">A++</button>
+      </div>
+    </div>
+    <div class="inema-appearance-sec">
+      <p class="inema-appearance-label">Fonte</p>
+      <div class="inema-appearance-row">
+        <button type="button" data-inema-set-font="inter" class="inema-chip">Inter</button>
+        <button type="button" data-inema-set-font="system" class="inema-chip">Sistema</button>
+        <button type="button" data-inema-set-font="leitura" class="inema-chip">Leitura</button>
+      </div>
+    </div>
+    <div class="inema-appearance-sec">
+      <p class="inema-appearance-label">Entrelinha</p>
+      <div class="inema-appearance-row">
+        <button type="button" data-inema-set-leading="1.5" class="inema-chip">Compacta</button>
+        <button type="button" data-inema-set-leading="1.7" class="inema-chip">Normal</button>
+        <button type="button" data-inema-set-leading="1.9" class="inema-chip">Ampla</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex items-center space-x-2 text-sm text-neutral-400"><a href="../../index.html" class="hover:text-blue-400">Início</a><span>/</span><span class="text-blue-400">Trilha 2</span></div>
+  </nav>
+
+  <header class="bg-gradient-to-br from-blue-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-track="2">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <div>
+          <span class="inline-block px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-full mb-4 uppercase tracking-wider">Trilha 2</span>
+          <h1 class="text-3xl sm:text-4xl font-bold mb-4 text-neutral-100">🛠️ Na prática</h1>
+          <p class="text-neutral-300 text-lg mb-6">Rodar os cinco testes na sua própria conta, escrever prompts do jeito novo e registrar o que viu.</p>
+          <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl font-bold text-blue-400">3</div><div class="text-xs text-neutral-500 mt-1">Módulos</div></div><div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl font-bold text-blue-400">18</div><div class="text-xs text-neutral-500 mt-1">Tópicos</div></div><div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl font-bold text-blue-400">~2.4h</div><div class="text-xs text-neutral-500 mt-1">Duração</div></div>
+          </div>
+          <div data-inema-meter="trilha:2" class="inema-meter bg-dark-800 rounded-xl p-4 border border-dark-600" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Progresso da trilha 2">
+            <div class="flex justify-between text-sm text-neutral-400 mb-2"><span>Seu progresso</span><span class="text-blue-400 font-semibold" data-inema-meter-pct>0%</span></div>
+            <div class="inema-bar h-2 bg-dark-700 rounded-full overflow-hidden mb-2"><div class="inema-bar__fill h-full bg-blue-500 rounded-full transition-all" data-inema-meter-fill style="width:0%"></div></div>
+            <div class="text-xs text-neutral-500"><span data-inema-meter-frac>0 de 18</span> tópicos concluídos</div>
+          </div>
+        </div>
+        <div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-4"><svg viewBox="0 0 800 300" class="w-full h-auto" role="img" aria-label="Diagrama dos 3 módulos da trilha 2: Na prática"><defs>
+    <linearGradient id="s23-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#3b82f6"/></linearGradient>
+    <filter id="s23-glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <pattern id="s23-grid" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="1.3" cy="1.3" r="1.3" fill="#3b82f6" opacity="0.14"/></pattern>
+  </defs><rect width="800" height="300" fill="url(#s23-grid)"/>
+      <g filter="url(#s23-glow)"><circle cx="130" cy="150" r="88" fill="#1e3a8a" stroke="url(#s23-g)" stroke-width="2.5"/></g>
+      <text x="130" y="142" text-anchor="middle" fill="#60a5fa" font-family="Inter,sans-serif" font-size="15" font-weight="800">Trilha 2</text><text x="130" y="160" text-anchor="middle" fill="#60a5fa" font-family="Inter,sans-serif" font-size="15" font-weight="800">Na prática</text><text x="130" y="178" text-anchor="middle" fill="#60a5fa" font-family="Inter,sans-serif" font-size="15" font-weight="800">18 tópicos</text><path d="M220 150 C 255 150, 255 63.333333333333336, 380 63.333333333333336" fill="none" stroke="#3b82f6" stroke-width="1.6" stroke-dasharray="5 5" opacity="0.6"/>
+        <g class="wf-a"><rect x="380" y="39.333333333333336" width="400" height="48" rx="10" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1.6"/>
+        <text x="420" y="69.33333333333334" text-anchor="middle" fill="#60a5fa" font-family="Inter,sans-serif" font-size="18" font-weight="800">+6</text>
+        <text x="454" y="60.333333333333336" fill="#e5e7eb" font-family="Inter,sans-serif" font-size="11.5" font-weight="600">2.1 Preparar o terreno e testar a memória</text>
+        <text x="454" y="76.33333333333334" fill="#9ca3af" font-family="Inter,sans-serif" font-size="9.5">Ficha, interruptores e o Teste 1</text></g><path d="M220 150 C 255 150, 255 150, 380 150" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-dasharray="5 5" opacity="0.6"/>
+        <g class="wf-a"><rect x="380" y="126" width="400" height="48" rx="10" fill="#0e1b26" stroke="#38bdf8" stroke-width="1.6"/>
+        <text x="420" y="156" text-anchor="middle" fill="#38bdf8" font-family="Inter,sans-serif" font-size="18" font-weight="800">+6</text>
+        <text x="454" y="147" fill="#e5e7eb" font-family="Inter,sans-serif" font-size="11.5" font-weight="600">2.2 Registro, interface, capacidade e controle</text>
+        <text x="454" y="163" fill="#9ca3af" font-family="Inter,sans-serif" font-size="9.5">Testes 2 a 5, com prompts prontos</text></g><path d="M220 150 C 255 150, 255 236.66666666666669, 380 236.66666666666669" fill="none" stroke="#3b82f6" stroke-width="1.6" stroke-dasharray="5 5" opacity="0.6"/>
+        <g class="wf-a"><rect x="380" y="212.66666666666669" width="400" height="48" rx="10" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1.6"/>
+        <text x="420" y="242.66666666666669" text-anchor="middle" fill="#60a5fa" font-family="Inter,sans-serif" font-size="18" font-weight="800">+6</text>
+        <text x="454" y="233.66666666666669" fill="#e5e7eb" font-family="Inter,sans-serif" font-size="11.5" font-weight="600">2.3 Escrever para o Fable e usar o Claude Code</text>
+        <text x="454" y="249.66666666666669" fill="#9ca3af" font-family="Inter,sans-serif" font-size="9.5">Menos micro-instrução, mais especificação</text></g></svg></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-6">Mapa da trilha</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <a href="#modulo-2-1" class="group bg-dark-800 rounded-xl border border-dark-600 hover:border-blue-500/30 p-5 transition-all">
+          <div class="flex items-center justify-between mb-3"><span class="text-blue-400 font-bold text-sm">2.1</span><span class="text-neutral-500 text-xs">~45 min</span></div>
+          <h3 class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors mb-1">🧾 Preparar o terreno e testar a memória</h3>
+          <p class="text-xs text-neutral-500">Ficha, interruptores e o Teste 1</p>
+        </a>
+        <a href="#modulo-2-2" class="group bg-dark-800 rounded-xl border border-dark-600 hover:border-blue-500/30 p-5 transition-all">
+          <div class="flex items-center justify-between mb-3"><span class="text-blue-400 font-bold text-sm">2.2</span><span class="text-neutral-500 text-xs">~50 min</span></div>
+          <h3 class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors mb-1">🧪 Registro, interface, capacidade e controle</h3>
+          <p class="text-xs text-neutral-500">Testes 2 a 5, com prompts prontos</p>
+        </a>
+        <a href="#modulo-2-3" class="group bg-dark-800 rounded-xl border border-dark-600 hover:border-blue-500/30 p-5 transition-all">
+          <div class="flex items-center justify-between mb-3"><span class="text-blue-400 font-bold text-sm">2.3</span><span class="text-neutral-500 text-xs">~50 min</span></div>
+          <h3 class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors mb-1">⌨️ Escrever para o Fable e usar o Claude Code</h3>
+          <p class="text-xs text-neutral-500">Menos micro-instrução, mais especificação</p>
+        </a></div>
+    </section>
+
+    <h2 class="text-2xl font-bold mb-6">Conteúdo detalhado</h2>
+
+    <div id="modulo-2-1" class="bg-dark-800 rounded-2xl border border-dark-600 mb-8 overflow-hidden scroll-mt-20" data-inema-module="2-1">
+      <div class="p-6 border-b border-dark-600">
+        <div class="flex items-start justify-between flex-wrap gap-3 mb-3">
+          <span class="text-blue-400 font-bold text-sm">Módulo 2.1</span>
+          <div class="flex items-center gap-4"><span class="text-neutral-500 text-sm">~45 min</span>
+            <span data-inema-meter="modulo:2-1" class="text-xs text-blue-400 font-semibold"><span data-inema-meter-frac>0 de 6</span></span></div>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">🧾 Preparar o terreno e testar a memória</h2>
+        <p class="text-neutral-400">Antes de testar, você precisa de uma ficha e de saber onde ficam os interruptores. Depois, o primeiro dos cinco testes: a memória lembra de você direito?</p>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-neutral-500 mb-4 font-semibold uppercase tracking-wider">Tópicos do módulo</p>
+        <div class="space-y-3 divide-y divide-dark-600">
+          
+          <div class="topic-item pt-3 first:pt-0">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-1-exp1">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">1</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">📋 A ficha de registro</span><p class="text-xs text-neutral-500 mt-0.5">Superfície, plano, data: sem isso o teste não vale</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-1-exp1">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Um formulário mínimo que acompanha cada um dos cinco testes: onde você testou, com qual plano, em que data, o que viu.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Testes de produto não são benchmarks universais. A ficha é o que torna seu resultado comparável com o de outra pessoa.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Superfície, plano, data, observação, veredito.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-1-exp2">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">2</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">🎛️ Onde ficam os interruptores</span><p class="text-xs text-neutral-500 mt-0.5">Memória, busca em chats, incógnito, projetos</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-1-exp2">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">As configurações que ligam e desligam a memória e a busca em conversas passadas, e como elas afetam o que você vai testar.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Se a memória está desligada, o Teste 1 falha por motivo errado. Você precisa saber o estado antes de começar.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">"Generate memory from chats", "Search and reference chats", chat incógnito, escopo de projeto.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-1-exp3">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">3</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">1️⃣ Teste 1: Continuidade</span><p class="text-xs text-neutral-500 mt-0.5">O que ele lembra do seu estilo e do seu projeto?</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-1-exp3">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Perguntar diretamente o que o Claude lembra sobre seu estilo de escrita ou projeto, e verificar precisão e escopo.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">É o teste mais simples da camada de memória. Revela se a memória é útil ou apenas decorativa.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Precisão, escopo, fato que muda a substância, sem meta-comentário.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-1-exp4">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">4</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">✏️ Corrigir um item de memória</span><p class="text-xs text-neutral-500 mt-0.5">A memória precisa ser editável, não só existir</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-1-exp4">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Pedir ao Claude para corrigir um fato guardado errado ou desatualizado, e conferir que a correção pegou.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Memória que não corrige vira erro permanente. O prompt capturado prevê edição exata e leitura antes de escrever.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">memory_str_replace, ler antes de escrever, fato desatualizado.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-1-exp5">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">5</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">🚧 O que a memória não pode guardar</span><p class="text-xs text-neutral-500 mt-0.5">Testar o limite rígido de propósito</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-1-exp5">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Pedir ao Claude para lembrar de algo que cai numa categoria bloqueada (por exemplo, um dado de saúde) e observar a recusa.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">A regra "pedir não desbloqueia" é uma das mais importantes do prompt capturado. Vale conferir se ela é respeitada.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Categorias proibidas, omissão, sem inferência, transparência.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-1-exp6">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">6</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">🔍 Ler o resultado do Teste 1</span><p class="text-xs text-neutral-500 mt-0.5">Acertou? Escopo certo? Mudou a substância?</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-1-exp6">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Um roteiro de três perguntas para transformar o que você viu num veredito defensável.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Sem critério, todo mundo acha que "funcionou mais ou menos". Com três perguntas, dois testadores chegam ao mesmo veredito.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Precisão, escopo, substância, veredito em uma frase.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 flex justify-start">
+          <a href="modulo-2-1.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-semibold rounded-xl border border-blue-500/30 transition-colors text-sm">Ver Completo →</a>
+        </div>
+      </div>
+    </div>
+    <div id="modulo-2-2" class="bg-dark-800 rounded-2xl border border-dark-600 mb-8 overflow-hidden scroll-mt-20" data-inema-module="2-2">
+      <div class="p-6 border-b border-dark-600">
+        <div class="flex items-start justify-between flex-wrap gap-3 mb-3">
+          <span class="text-blue-400 font-bold text-sm">Módulo 2.2</span>
+          <div class="flex items-center gap-4"><span class="text-neutral-500 text-sm">~50 min</span>
+            <span data-inema-meter="modulo:2-2" class="text-xs text-blue-400 font-semibold"><span data-inema-meter-frac>0 de 6</span></span></div>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">🧪 Registro, interface, capacidade e controle</h2>
+        <p class="text-neutral-400">Quatro testes, um por grupo de ferramentas novas: ele reabre a conversa original ou inventa? Devolve um visual? Sugere uma skill sem insistir? Você consegue apagar um item da memória?</p>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-neutral-500 mb-4 font-semibold uppercase tracking-wider">Tópicos do módulo</p>
+        <div class="space-y-3 divide-y divide-dark-600">
+          
+          <div class="topic-item pt-3 first:pt-0">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-2-exp1">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">1</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">2️⃣ Teste 2: Registro</span><p class="text-xs text-neutral-500 mt-0.5">Ele busca a conversa original ou inventa continuidade?</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-2-exp1">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Referenciar uma decisão de uma conversa antiga sem re-explicar e observar se o Claude busca antes de responder.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">É o teste da camada de conversas passadas. A regra do prompt capturado é: nunca dizer "não vejo conversa anterior" sem ter buscado.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Pistas linguísticas, conversation_search, recent_chats, read_conversation.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-2-exp2">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">2</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">🧭 Como formular para a busca achar</span><p class="text-xs text-neutral-500 mt-0.5">Palavras de conteúdo, não palavras sobre a conversa</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-2-exp2">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">A busca em conversas é uma busca textual: precisa de palavras que estavam na conversa original.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Muita "falha de memória" é pergunta mal formulada. Saber isso separa limitação do produto de erro seu.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Substantivos de conteúdo, nome próprio, janela de tempo, paginação.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-2-exp3">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">3</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">3️⃣ Teste 3: Interface</span><p class="text-xs text-neutral-500 mt-0.5">Dados pequenos, pedido de "apresentação mais útil"</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-2-exp3">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Dar ao Claude uma tabela pequena e pedir a forma mais útil de apresentar. Observar se aparece um visual nativo.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Testa a camada de interface (13 ferramentas). E testa a rotina de 4 passos: sem intenção visual, ele pode ficar em prosa de propósito.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">chart_display, comparison_card, palavras de intenção visual, disponibilidade por plano.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-2-exp4">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">4</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">4️⃣ Teste 4: Capacidade</span><p class="text-xs text-neutral-500 mt-0.5">Uma tarefa repetitiva; ele sugere uma skill ou plugin?</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-2-exp4">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Dar uma tarefa especializada e repetível e perguntar se uma skill ou plugin melhoraria o fluxo. Observar se ele sugere (no máximo um cartão) e se a sugestão é pertinente.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Testa as quatro ferramentas de descoberta de capacidades e a regra de contenção (um cartão por conversa).</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">search_skills, search_plugins, suggest_skills, um cartão por conversa.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-2-exp5">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">5</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">5️⃣ Teste 5: Controle</span><p class="text-xs text-neutral-500 mt-0.5">Inspecione a memória e remova um item</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-2-exp5">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Abrir as configurações de memória, remover um item guardado e confirmar em conversa nova que sumiu.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Memória melhor precisa ser compreensível e corrigível. Se você não consegue ver e apagar, o resto é risco.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">memory_delete, configurações de memória, verificação em conversa nova.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-2-exp6">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">6</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">🏁 Fechar a ficha dos cinco testes</span><p class="text-xs text-neutral-500 mt-0.5">Veredito próprio em uma frase</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-2-exp6">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Consolidar as cinco fichas numa tabela e escrever um veredito de uma frase sobre o produto na sua conta.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">É o "certificado" prático desta trilha: uma avaliação sua, datada, defensável, que você pode comparar com a de outra pessoa.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Consolidação, comparação entre superfícies, veredito próprio.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 flex justify-start">
+          <a href="modulo-2-2.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-semibold rounded-xl border border-blue-500/30 transition-colors text-sm">Ver Completo →</a>
+        </div>
+      </div>
+    </div>
+    <div id="modulo-2-3" class="bg-dark-800 rounded-2xl border border-dark-600 mb-8 overflow-hidden scroll-mt-20" data-inema-module="2-3">
+      <div class="p-6 border-b border-dark-600">
+        <div class="flex items-start justify-between flex-wrap gap-3 mb-3">
+          <span class="text-blue-400 font-bold text-sm">Módulo 2.3</span>
+          <div class="flex items-center gap-4"><span class="text-neutral-500 text-sm">~50 min</span>
+            <span data-inema-meter="modulo:2-3" class="text-xs text-blue-400 font-semibold"><span data-inema-meter-frac>0 de 6</span></span></div>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">⌨️ Escrever para o Fable e usar o Claude Code</h2>
+        <p class="text-neutral-400">Prompts escritos para modelos anteriores costumam ser prescritivos demais para o Fable 5.1. Este módulo mostra o que tirar, o que acrescentar, e como o esforço (effort) no Claude Code muda tempo, custo e resultado.</p>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-neutral-500 mb-4 font-semibold uppercase tracking-wider">Tópicos do módulo</p>
+        <div class="space-y-3 divide-y divide-dark-600">
+          
+          <div class="topic-item pt-3 first:pt-0">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-3-exp1">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">1</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">✂️ Prompts antigos são prescritivos demais</span><p class="text-xs text-neutral-500 mt-0.5">O que tirar do seu prompt</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-3-exp1">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Micro-instruções acumuladas para modelos anteriores ("seja conciso", "use bullets", "pense passo a passo") tendem a piorar o resultado no Fable 5.1.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">A documentação de migração da Anthropic diz isso diretamente: prompts escritos para modelos anteriores frequentemente reduzem a qualidade da saída.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Micro-instrução, andaime, autonomia, especificação.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-3-exp2">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">2</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">⏰ Diga o QUANDO, não só o quê</span><p class="text-xs text-neutral-500 mt-0.5">Gatilhos para ferramentas, memória e delegação</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-3-exp2">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Modelos recentes são conservadores em usar capacidades que exigem uma decisão explícita (memória em arquivo, busca, subagentes). A solução é dizer quando cada uma se aplica.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">A documentação de migração recomenda gatilhos explícitos em vez de apenas listar que a ferramenta existe.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Gatilho, descrição prescritiva, "chame isto quando", sub-utilização.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-3-exp3">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">3</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">📐 Peça o formato, não a fórmula</span><p class="text-xs text-neutral-500 mt-0.5">Saída concreta em vez de instrução de comportamento</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-3-exp3">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Descrever o resultado esperado (estrutura, campos, tamanho) é mais eficaz do que descrever como o modelo deve se comportar.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">O Fable 5.1 segue instruções de forma literal e escala a extensão à complexidade da tarefa. Um exemplo positivo curto vale mais que três negativas.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Exemplo positivo, formato de saída, literalidade, extensão calibrada.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-3-exp4">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">4</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">🎚️ Claude Code: o botão de esforço</span><p class="text-xs text-neutral-500 mt-0.5">low, medium, high, xhigh, max</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-3-exp4">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">No Claude Code e na API, o esforço (effort) controla quanto o modelo pensa e quantas chamadas de ferramenta faz. É o primeiro botão de custo e tempo.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Esforço importa mais nestes modelos do que em qualquer anterior. Baixo é mais rápido e barato; alto vale em tarefa longa e difícil.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">effort, xhigh como padrão do Claude Code, curva plana × íngreme.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-3-exp5">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">5</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">🗃️ Memória em arquivo e skills no Claude Code</span><p class="text-xs text-neutral-500 mt-0.5">CLAUDE.md, pasta de skills, gatilhos</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-3-exp5">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">No Claude Code, a memória persistente é um arquivo que você controla (CLAUDE.md e memória do projeto), e as skills são pastas de instruções. É a versão "de mão" das ferramentas de memória do app.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Você vê e edita tudo. É o jeito mais concreto de entender o que o app faz por baixo.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">CLAUDE.md, memória do projeto, skill, SKILL.md, leitura antes de agir.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t2m2-3-exp6">
+              <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold flex items-center justify-center flex-shrink-0">6</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">🚀 Exemplo completo: tarefa longa bem especificada</span><p class="text-xs text-neutral-500 mt-0.5">Tudo no primeiro turno, esforço alto</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t2m2-3-exp6">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Um prompt de tarefa longa com especificação completa de uma vez: contexto, critério de pronto, restrições, o que fazer em caso de dúvida.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">A recomendação oficial para trabalho longo com agentes é dar a especificação completa numa única mensagem bem escrita e rodar em esforço alto.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-blue-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Especificação completa, critério de pronto, autonomia calibrada, esforço alto.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 flex justify-start">
+          <a href="modulo-2-3.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-semibold rounded-xl border border-blue-500/30 transition-colors text-sm">Ver Completo →</a>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-between items-center mt-10 pt-8 border-t border-dark-600 flex-wrap gap-3">
+      <a href="../trilha1/index.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-dark-700 hover:bg-dark-600 text-neutral-300 font-semibold rounded-xl border border-dark-600 transition-colors text-sm">← Trilha 1: O que mudou</a>
+      <a href="../trilha3/index.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 font-semibold rounded-xl border border-purple-500/30 transition-colors text-sm">Trilha 3: Gastar menos →</a>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-dark-600 mt-16 py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm space-y-2">
+      <p>Fable 5.1 na prática · Trilha 2 — Na prática · 2026 ·
+        <a href="https://inema.club" target="_blank" class="text-sky-400 hover:text-sky-300">INEMA.CLUB</a> -
+        <a href="https://inema.pro" target="_blank" class="text-amber-700 dark:text-slate-300">PRO</a></p>
+      <p class="text-xs">Fonte do prompt de sistema: <a href="https://platform.claude.com/docs/en/release-notes/system-prompts/claude-fable-5-1" target="_blank" class="text-sky-400 hover:text-sky-300">prompt oficial publicado pela Anthropic</a> ·
+        <a href="https://github.com/elder-plinius/CL4R1T4S/tree/main/ANTHROPIC" target="_blank" class="text-sky-400 hover:text-sky-300">extração pública do runtime completo</a> (não autenticada; congelada em 02/09/2026).</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS núcleo v1 -->
+  <script>
+    function toggleTopic(button) {
+      const topicItem = button.closest('.topic-item');
+      const explanation = topicItem.querySelector('.topic-explanation');
+      const moduleCard = button.closest('.bg-dark-800');
+      if (moduleCard) {
+        moduleCard.querySelectorAll('.topic-explanation.active').forEach(exp => {
+          if (exp !== explanation) { exp.classList.remove('active'); const b = exp.parentElement.querySelector('[aria-controls="' + exp.id + '"]'); if (b) b.setAttribute('aria-expanded', 'false'); }
+        });
+      }
+      const isOpen = explanation.classList.toggle('active');
+      button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+    const html = document.documentElement;
+    if (!html.classList.contains('dark')) { themeToggleDarkIcon.classList.remove('hidden'); } else { themeToggleLightIcon.classList.remove('hidden'); }
+    themeToggle.addEventListener('click', () => {
+      themeToggleDarkIcon.classList.toggle('hidden');
+      themeToggleLightIcon.classList.toggle('hidden');
+      html.classList.toggle('dark');
+      const dark = html.classList.contains('dark');
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+      if (window.INEMA && INEMA.setPref) { try { INEMA.setPref('theme', dark ? 'inema-dark' : 'claro'); } catch (e) {} }
+    });
+    function openModal(modalId) { const m = document.getElementById(modalId); if (m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; } }
+    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden')); document.body.style.overflow = 'auto'; }
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    // Quiz inline (3 perguntas por módulo)
+    document.addEventListener('click', (e) => {
+      const opt = e.target.closest('.qz-opt'); if (!opt) return;
+      const qz = opt.closest('.qz'); if (!qz || qz.hasAttribute('data-answered')) return;
+      const ok = opt.getAttribute('data-ok') === '1';
+      qz.querySelectorAll('.qz-opt').forEach(o => { o.setAttribute('data-state', o.getAttribute('data-ok') === '1' ? 'ok' : (o === opt ? 'no' : '')); o.disabled = true; });
+      qz.setAttribute('data-answered', ok ? 'ok' : 'no');
+      const fb = qz.querySelector('.qz-fb'); if (fb) fb.textContent = (ok ? '✓ Certo. ' : '✗ Não é essa. ') + (fb.getAttribute('data-text') || '');
+    });
+    // Copiar código
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-copy]'); if (!b) return;
+      const pre = b.closest('.codebox').querySelector('pre');
+      navigator.clipboard && navigator.clipboard.writeText(pre.innerText).then(() => { const t = b.textContent; b.textContent = 'Copiado ✓'; setTimeout(() => b.textContent = t, 1600); });
+    });
+  </script>
+
+  <script src="../../assets/learn.js"></script>
+  <script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') { window.INEMA.init(); }
+  </script>
+</body>
+</html>

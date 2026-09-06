@@ -1,0 +1,4 @@
+# material-fonte local (PDFs e dump do prompt) — não publicar
+doc/
+node_modules/
+.DS_Store

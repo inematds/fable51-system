@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="inema-course" content="fable51">
+  <title>Trilha 3 — Gastar menos | Fable 5.1 na prática</title>
+  <meta name="description" content="Por token o Fable custa mais. A economia só existe em custo por tarefa concluída. Como medir e onde o barato ganha.">
+
+  <!-- ANTI-FOUC: bloqueante, antes de tudo -->
+  <script>
+(function () {
+  try {
+    var html = document.documentElement;
+    var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+    function clone(o) { var r = {}; for (var x in o) r[x] = o[x]; return r; }
+    var p = clone(DEF);
+    try {
+      var raw = localStorage.getItem('inema.prefs');
+      if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed === 'object') { for (var k in DEF) if (parsed[k] != null) p[k] = parsed[k]; } }
+      else { var legacy = localStorage.getItem('theme'); if (legacy === 'light') p.theme = 'claro'; else if (legacy === 'dark') p.theme = 'inema-dark'; }
+    } catch (e) { p = clone(DEF); }
+    var THEMES = { 'inema-dark': { dark: true, attr: null, cs: 'dark' }, 'claro': { dark: false, attr: null, cs: 'light' }, 'sepia': { dark: false, attr: 'sepia', cs: 'light' }, 'foco': { dark: null, attr: 'foco', cs: null }, 'contraste': { dark: true, attr: 'contraste', cs: 'dark' } };
+    var t = THEMES[p.theme] || THEMES['inema-dark'];
+    if (t.dark === true) html.classList.add('dark'); else if (t.dark === false) html.classList.remove('dark');
+    if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+    html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark') ? 'dark' : 'light'));
+    html.setAttribute('data-font', p.font || 'inter'); html.setAttribute('data-accent', p.accent || 'emerald');
+    var s = html.style; var scale = (+p.fontScale || 100);
+    s.setProperty('--inema-font-scale', (scale / 100).toString()); s.setProperty('font-size', scale + '%');
+    s.setProperty('--measure', (+p.lineWidth || 68) + 'ch'); s.setProperty('--lh-body', (+p.leading || 1.7).toString());
+    var fam = p.font === 'system' ? 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif' : (p.font === 'leitura' ? '"Atkinson Hyperlegible", "Inter", system-ui, sans-serif' : '"Inter", system-ui, sans-serif');
+    s.setProperty('--font-body', fam);
+    var ACC = { emerald: [152, 76, 45], blue: [217, 91, 60], purple: [258, 90, 66], amber: [38, 92, 50], teal: [174, 72, 41], rose: [350, 89, 60] };
+    var a = ACC[p.accent] || ACC.emerald;
+    s.setProperty('--accent-h', a[0] + ''); s.setProperty('--accent-s', a[1] + '%'); s.setProperty('--accent-l', a[2] + '%');
+    s.setProperty('--accent', 'hsl(' + a[0] + ' ' + a[1] + '% ' + a[2] + '%)');
+  } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme = 'dark'; } catch (e) {} }
+})();
+</script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#FACC15', dark: { 900: '#111827', 800: '#1f2937', 700: '#374151', 600: '#4b5563' } } } } }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/learn.css">
+
+  <!-- Manifesto do curso (obrigatório em toda página) -->
+  <script type="application/json" data-inema-manifest>
+{
+ "course": "fable51",
+ "tracks": [
+  {
+   "n": "1",
+   "title": "O que mudou",
+   "modules": [
+    {
+     "id": "1-1",
+     "title": "Duas coisas chamadas \"prompt de sistema\"",
+     "topics": 6,
+     "href": "curso/trilha1/modulo-1-1.html"
+    },
+    {
+     "id": "1-2",
+     "title": "Claude é mais do que o modelo",
+     "topics": 6,
+     "href": "curso/trilha1/modulo-1-2.html"
+    },
+    {
+     "id": "1-3",
+     "title": "O paradoxo e as regras que vieram junto",
+     "topics": 6,
+     "href": "curso/trilha1/modulo-1-3.html"
+    }
+   ]
+  },
+  {
+   "n": "2",
+   "title": "Na prática",
+   "modules": [
+    {
+     "id": "2-1",
+     "title": "Preparar o terreno e testar a memória",
+     "topics": 6,
+     "href": "curso/trilha2/modulo-2-1.html"
+    },
+    {
+     "id": "2-2",
+     "title": "Registro, interface, capacidade e controle",
+     "topics": 6,
+     "href": "curso/trilha2/modulo-2-2.html"
+    },
+    {
+     "id": "2-3",
+     "title": "Escrever para o Fable e usar o Claude Code",
+     "topics": 6,
+     "href": "curso/trilha2/modulo-2-3.html"
+    }
+   ]
+  },
+  {
+   "n": "3",
+   "title": "Gastar menos",
+   "modules": [
+    {
+     "id": "3-1",
+     "title": "Preço por token contra preço por tarefa",
+     "topics": 6,
+     "href": "curso/trilha3/modulo-3-1.html"
+    },
+    {
+     "id": "3-2",
+     "title": "Esforço, falhas e a cauda",
+     "topics": 6,
+     "href": "curso/trilha3/modulo-3-2.html"
+    },
+    {
+     "id": "3-3",
+     "title": "Alavancas do 5.1 para quem usa a API",
+     "topics": 6,
+     "href": "curso/trilha3/modulo-3-3.html"
+    }
+   ]
+  }
+ ]
+}
+  </script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    html { scroll-behavior: smooth; }
+    [id] { scroll-margin-top: 5rem; }
+
+    /* Light mode overrides */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .bg-dark-800\/50, html:not(.dark) .bg-dark-800\/60, html:not(.dark) .bg-dark-900\/40, html:not(.dark) .bg-dark-900\/60 { background-color: #f3f4f6; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-white { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    
+    html:not(.dark) .text-emerald-400 { color: #059669; }
+    html:not(.dark) .bg-emerald-500\/20 { background-color: rgba(5, 150, 105, 0.12); }
+    html:not(.dark) .bg-emerald-500\/10 { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .bg-emerald-900\/20 { background-color: rgba(5, 150, 105, 0.07); }
+    html:not(.dark) .border-emerald-500\/30 { border-color: rgba(5, 150, 105, 0.25); }
+    html:not(.dark) .hover\:bg-emerald-500\/30:hover { background-color: rgba(5, 150, 105, 0.18); }
+    html:not(.dark) .hover\:text-emerald-400:hover { color: #059669; }
+    html:not(.dark) .hover\:bg-emerald-500\/10:hover { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-emerald-400 { color: #059669; }
+
+    html:not(.dark) .text-blue-400 { color: #2563eb; }
+    html:not(.dark) .bg-blue-500\/20 { background-color: rgba(37, 99, 235, 0.12); }
+    html:not(.dark) .bg-blue-500\/10 { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .bg-blue-900\/20 { background-color: rgba(37, 99, 235, 0.07); }
+    html:not(.dark) .border-blue-500\/30 { border-color: rgba(37, 99, 235, 0.25); }
+    html:not(.dark) .hover\:bg-blue-500\/30:hover { background-color: rgba(37, 99, 235, 0.18); }
+    html:not(.dark) .hover\:text-blue-400:hover { color: #2563eb; }
+    html:not(.dark) .hover\:bg-blue-500\/10:hover { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-blue-400 { color: #2563eb; }
+
+    html:not(.dark) .text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .bg-purple-500\/20 { background-color: rgba(124, 58, 237, 0.12); }
+    html:not(.dark) .bg-purple-500\/10 { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .bg-purple-900\/20 { background-color: rgba(124, 58, 237, 0.07); }
+    html:not(.dark) .border-purple-500\/30 { border-color: rgba(124, 58, 237, 0.25); }
+    html:not(.dark) .hover\:bg-purple-500\/30:hover { background-color: rgba(124, 58, 237, 0.18); }
+    html:not(.dark) .hover\:text-purple-400:hover { color: #7c3aed; }
+    html:not(.dark) .hover\:bg-purple-500\/10:hover { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-purple-400 { color: #7c3aed; }
+
+    html:not(.dark) .text-amber-400 { color: #92400e; }
+    html:not(.dark) .bg-amber-500\/20 { background-color: rgba(146, 64, 14, 0.12); }
+    html:not(.dark) .bg-amber-500\/10 { background-color: rgba(146, 64, 14, 0.08); }
+    html:not(.dark) .bg-amber-900\/20 { background-color: rgba(146, 64, 14, 0.07); }
+    html:not(.dark) .border-amber-500\/30 { border-color: rgba(146, 64, 14, 0.25); }
+    html:not(.dark) .hover\:bg-amber-500\/30:hover { background-color: rgba(146, 64, 14, 0.18); }
+    html:not(.dark) .hover\:text-amber-400:hover { color: #92400e; }
+    html:not(.dark) .hover\:bg-amber-500\/10:hover { background-color: rgba(146, 64, 14, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-amber-400 { color: #92400e; }
+
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .bg-red-500\/20 { background-color: rgba(185, 28, 28, 0.12); }
+    html:not(.dark) .bg-red-500\/10 { background-color: rgba(185, 28, 28, 0.08); }
+    html:not(.dark) .bg-red-900\/20 { background-color: rgba(185, 28, 28, 0.07); }
+    html:not(.dark) .border-red-500\/30 { border-color: rgba(185, 28, 28, 0.25); }
+    html:not(.dark) .hover\:bg-red-500\/30:hover { background-color: rgba(185, 28, 28, 0.18); }
+    html:not(.dark) .hover\:text-red-400:hover { color: #b91c1c; }
+    html:not(.dark) .hover\:bg-red-500\/10:hover { background-color: rgba(185, 28, 28, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-red-400 { color: #b91c1c; }
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161, 98, 7, 0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161, 98, 7, 0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255, 255, 255, 0.95); }
+    html:not(.dark) .text-amber-700 { color: #92400e; }
+
+    /* Dark mode - bordas suaves */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+
+    /* SVG */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    @keyframes wf-pulse { 0%,100% { opacity:.55 } 50% { opacity:1 } }
+    @keyframes wf-flow { to { stroke-dashoffset: -28; } }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s} .wf-a:nth-child(6){animation-delay:1.25s}
+      .wf-flow { stroke-dasharray: 6 8; animation: wf-flow 1.4s linear infinite; }
+    }
+
+    /* Quiz */
+    .qz-opt[data-state="ok"] { border-color: #10b981; background: rgba(16,185,129,.15); }
+    .qz-opt[data-state="no"] { border-color: #ef4444; background: rgba(239,68,68,.12); }
+    .qz-fb { display:none; } .qz[data-answered] .qz-fb { display:block; }
+
+    /* Code box */
+    .codebox pre { white-space: pre-wrap; word-break: break-word; }
+    
+  </style>
+</head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen">
+
+  <!-- NAVIGATION -->
+  <nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-14">
+        <div class="flex items-center space-x-3">
+          <a href="../../index.html" class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300">
+            <span class="text-2xl">⚡</span>
+            <span class="font-bold text-lg hidden md:inline">Fable 5.1</span>
+          </a>
+          <span class="text-neutral-600">|</span>
+          <a href="https://inema.club" target="_blank" class="text-sky-400 hover:text-sky-300 text-sm font-medium">INEMA.CLUB</a>
+          <span class="text-neutral-600 hidden sm:inline">-</span>
+          <a href="https://inema.pro" target="_blank" class="text-amber-700 dark:text-slate-300 hover:opacity-80 text-sm font-medium hidden sm:inline">PRO</a>
+        </div>
+        <div class="flex items-center space-x-1 sm:space-x-2">
+          <a href="../../curso/trilha1/index.html" class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors">
+            <span class="sm:hidden">T1</span>
+            <span class="hidden sm:inline">O que mudou</span>
+          </a>
+          <a href="../../curso/trilha2/index.html" class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors">
+            <span class="sm:hidden">T2</span>
+            <span class="hidden sm:inline">Na prática</span>
+          </a>
+          <a href="../../curso/trilha3/index.html" class="px-3 py-1.5 rounded-lg text-sm font-semibold text-purple-400 bg-purple-500/10">
+            <span class="sm:hidden">T3</span>
+            <span class="hidden sm:inline">Gastar menos</span>
+          </a>
+          <button type="button" data-inema-journey-open class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-primary bg-primary/10 hover:bg-primary/20 transition-colors">
+            <span>🧭</span><span>Minha jornada</span>
+            <span data-inema-journey-badge class="text-xs px-1.5 py-0.5 rounded-full bg-primary/20"></span>
+          </button>
+          <button type="button" data-inema-appearance-toggle="[data-inema-appearance]" aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" title="Aparência e leitura">
+            <span aria-hidden="true">Aa</span>
+          </button>
+          <button id="theme-toggle" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" title="Tema claro/escuro">
+            <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5 text-neutral-300" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+            <svg id="theme-toggle-light-icon" class="hidden w-5 h-5 text-neutral-300" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  <div data-inema-appearance class="inema-appearance-pop" role="region" aria-label="Aparência e leitura">
+    <div class="inema-appearance-sec">
+      <p class="inema-appearance-label">Tema</p>
+      <div class="inema-appearance-row">
+        <button type="button" data-inema-set-theme="inema-dark" class="inema-chip">Escuro</button>
+        <button type="button" data-inema-set-theme="claro" class="inema-chip">Claro</button>
+        <button type="button" data-inema-set-theme="sepia" class="inema-chip">Sépia</button>
+        <button type="button" data-inema-set-theme="foco" class="inema-chip">Foco</button>
+        <button type="button" data-inema-set-theme="contraste" class="inema-chip">Contraste</button>
+      </div>
+    </div>
+    <div class="inema-appearance-sec">
+      <p class="inema-appearance-label">Tamanho do texto</p>
+      <div class="inema-appearance-row">
+        <button type="button" data-inema-set-fontscale="90" class="inema-chip">A-</button>
+        <button type="button" data-inema-set-fontscale="100" class="inema-chip">A</button>
+        <button type="button" data-inema-set-fontscale="115" class="inema-chip">A+</button>
+        <button type="button" data-inema-set-fontscale="130" class="inema-chip">A++</button>
+      </div>
+    </div>
+    <div class="inema-appearance-sec">
+      <p class="inema-appearance-label">Fonte</p>
+      <div class="inema-appearance-row">
+        <button type="button" data-inema-set-font="inter" class="inema-chip">Inter</button>
+        <button type="button" data-inema-set-font="system" class="inema-chip">Sistema</button>
+        <button type="button" data-inema-set-font="leitura" class="inema-chip">Leitura</button>
+      </div>
+    </div>
+    <div class="inema-appearance-sec">
+      <p class="inema-appearance-label">Entrelinha</p>
+      <div class="inema-appearance-row">
+        <button type="button" data-inema-set-leading="1.5" class="inema-chip">Compacta</button>
+        <button type="button" data-inema-set-leading="1.7" class="inema-chip">Normal</button>
+        <button type="button" data-inema-set-leading="1.9" class="inema-chip">Ampla</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex items-center space-x-2 text-sm text-neutral-400"><a href="../../index.html" class="hover:text-purple-400">Início</a><span>/</span><span class="text-purple-400">Trilha 3</span></div>
+  </nav>
+
+  <header class="bg-gradient-to-br from-purple-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-track="3">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <div>
+          <span class="inline-block px-3 py-1 bg-purple-500/20 text-purple-400 text-xs font-semibold rounded-full mb-4 uppercase tracking-wider">Trilha 3</span>
+          <h1 class="text-3xl sm:text-4xl font-bold mb-4 text-neutral-100">💰 Gastar menos</h1>
+          <p class="text-neutral-300 text-lg mb-6">Por token o Fable custa mais. A economia só existe em custo por tarefa concluída. Como medir e onde o barato ganha.</p>
+          <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl font-bold text-purple-400">3</div><div class="text-xs text-neutral-500 mt-1">Módulos</div></div><div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl font-bold text-purple-400">18</div><div class="text-xs text-neutral-500 mt-1">Tópicos</div></div><div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl font-bold text-purple-400">~2.3h</div><div class="text-xs text-neutral-500 mt-1">Duração</div></div>
+          </div>
+          <div data-inema-meter="trilha:3" class="inema-meter bg-dark-800 rounded-xl p-4 border border-dark-600" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Progresso da trilha 3">
+            <div class="flex justify-between text-sm text-neutral-400 mb-2"><span>Seu progresso</span><span class="text-purple-400 font-semibold" data-inema-meter-pct>0%</span></div>
+            <div class="inema-bar h-2 bg-dark-700 rounded-full overflow-hidden mb-2"><div class="inema-bar__fill h-full bg-purple-500 rounded-full transition-all" data-inema-meter-fill style="width:0%"></div></div>
+            <div class="text-xs text-neutral-500"><span data-inema-meter-frac>0 de 18</span> tópicos concluídos</div>
+          </div>
+        </div>
+        <div class="rounded-2xl border border-purple-500/30 bg-dark-900/40 p-4"><svg viewBox="0 0 800 300" class="w-full h-auto" role="img" aria-label="Diagrama dos 3 módulos da trilha 3: Gastar menos"><defs>
+    <linearGradient id="s35-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c084fc"/><stop offset="1" stop-color="#a855f7"/></linearGradient>
+    <filter id="s35-glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <pattern id="s35-grid" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="1.3" cy="1.3" r="1.3" fill="#a855f7" opacity="0.14"/></pattern>
+  </defs><rect width="800" height="300" fill="url(#s35-grid)"/>
+      <g filter="url(#s35-glow)"><circle cx="130" cy="150" r="88" fill="#3b0764" stroke="url(#s35-g)" stroke-width="2.5"/></g>
+      <text x="130" y="142" text-anchor="middle" fill="#c084fc" font-family="Inter,sans-serif" font-size="15" font-weight="800">Trilha 3</text><text x="130" y="160" text-anchor="middle" fill="#c084fc" font-family="Inter,sans-serif" font-size="15" font-weight="800">Gastar menos</text><text x="130" y="178" text-anchor="middle" fill="#c084fc" font-family="Inter,sans-serif" font-size="15" font-weight="800">18 tópicos</text><path d="M220 150 C 255 150, 255 63.333333333333336, 380 63.333333333333336" fill="none" stroke="#a855f7" stroke-width="1.6" stroke-dasharray="5 5" opacity="0.6"/>
+        <g class="wf-a"><rect x="380" y="39.333333333333336" width="400" height="48" rx="10" fill="#3b0764" stroke="#a855f7" stroke-width="1.6"/>
+        <text x="420" y="69.33333333333334" text-anchor="middle" fill="#c084fc" font-family="Inter,sans-serif" font-size="18" font-weight="800">+6</text>
+        <text x="454" y="60.333333333333336" fill="#e5e7eb" font-family="Inter,sans-serif" font-size="11.5" font-weight="600">3.1 Preço por token contra preço por tarefa</text>
+        <text x="454" y="76.33333333333334" fill="#9ca3af" font-family="Inter,sans-serif" font-size="9.5">Fable custa 2x o Opus. E daí?</text></g><path d="M220 150 C 255 150, 255 150, 380 150" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-dasharray="5 5" opacity="0.6"/>
+        <g class="wf-a"><rect x="380" y="126" width="400" height="48" rx="10" fill="#0e1b26" stroke="#38bdf8" stroke-width="1.6"/>
+        <text x="420" y="156" text-anchor="middle" fill="#38bdf8" font-family="Inter,sans-serif" font-size="18" font-weight="800">+6</text>
+        <text x="454" y="147" fill="#e5e7eb" font-family="Inter,sans-serif" font-size="11.5" font-weight="600">3.2 Esforço, falhas e a cauda</text>
+        <text x="454" y="163" fill="#9ca3af" font-family="Inter,sans-serif" font-size="9.5">O primeiro botão antes de trocar de modelo</text></g><path d="M220 150 C 255 150, 255 236.66666666666669, 380 236.66666666666669" fill="none" stroke="#a855f7" stroke-width="1.6" stroke-dasharray="5 5" opacity="0.6"/>
+        <g class="wf-a"><rect x="380" y="212.66666666666669" width="400" height="48" rx="10" fill="#3b0764" stroke="#a855f7" stroke-width="1.6"/>
+        <text x="420" y="242.66666666666669" text-anchor="middle" fill="#c084fc" font-family="Inter,sans-serif" font-size="18" font-weight="800">+6</text>
+        <text x="454" y="233.66666666666669" fill="#e5e7eb" font-family="Inter,sans-serif" font-size="11.5" font-weight="600">3.3 Alavancas do 5.1 para quem usa a API</text>
+        <text x="454" y="249.66666666666669" fill="#9ca3af" font-family="Inter,sans-serif" font-size="9.5">Opcional: cache, esforço por mensagem, orçamento, lote</text></g></svg></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-6">Mapa da trilha</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <a href="#modulo-3-1" class="group bg-dark-800 rounded-xl border border-dark-600 hover:border-purple-500/30 p-5 transition-all">
+          <div class="flex items-center justify-between mb-3"><span class="text-purple-400 font-bold text-sm">3.1</span><span class="text-neutral-500 text-xs">~45 min</span></div>
+          <h3 class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors mb-1">🏷️ Preço por token contra preço por tarefa</h3>
+          <p class="text-xs text-neutral-500">Fable custa 2x o Opus. E daí?</p>
+        </a>
+        <a href="#modulo-3-2" class="group bg-dark-800 rounded-xl border border-dark-600 hover:border-purple-500/30 p-5 transition-all">
+          <div class="flex items-center justify-between mb-3"><span class="text-purple-400 font-bold text-sm">3.2</span><span class="text-neutral-500 text-xs">~45 min</span></div>
+          <h3 class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors mb-1">🎚️ Esforço, falhas e a cauda</h3>
+          <p class="text-xs text-neutral-500">O primeiro botão antes de trocar de modelo</p>
+        </a>
+        <a href="#modulo-3-3" class="group bg-dark-800 rounded-xl border border-dark-600 hover:border-purple-500/30 p-5 transition-all">
+          <div class="flex items-center justify-between mb-3"><span class="text-purple-400 font-bold text-sm">3.3</span><span class="text-neutral-500 text-xs">~50 min</span></div>
+          <h3 class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors mb-1">🔧 Alavancas do 5.1 para quem usa a API</h3>
+          <p class="text-xs text-neutral-500">Opcional: cache, esforço por mensagem, orçamento, lote</p>
+        </a></div>
+    </section>
+
+    <h2 class="text-2xl font-bold mb-6">Conteúdo detalhado</h2>
+
+    <div id="modulo-3-1" class="bg-dark-800 rounded-2xl border border-dark-600 mb-8 overflow-hidden scroll-mt-20" data-inema-module="3-1">
+      <div class="p-6 border-b border-dark-600">
+        <div class="flex items-start justify-between flex-wrap gap-3 mb-3">
+          <span class="text-purple-400 font-bold text-sm">Módulo 3.1</span>
+          <div class="flex items-center gap-4"><span class="text-neutral-500 text-sm">~45 min</span>
+            <span data-inema-meter="modulo:3-1" class="text-xs text-purple-400 font-semibold"><span data-inema-meter-frac>0 de 6</span></span></div>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">🏷️ Preço por token contra preço por tarefa</h2>
+        <p class="text-neutral-400">Por token, o Fable 5.1 é o modelo mais caro da família. A economia só existe medida em custo por tarefa concluída: menos turnos, menos retrabalho, esforço calibrado. E há casos em que o modelo mais barato vence.</p>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-neutral-500 mb-4 font-semibold uppercase tracking-wider">Tópicos do módulo</p>
+        <div class="space-y-3 divide-y divide-dark-600">
+          
+          <div class="topic-item pt-3 first:pt-0">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-1-exp1">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">1</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">💵 A tabela de preços</span><p class="text-xs text-neutral-500 mt-0.5">Quanto custa cada milhão de tokens</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-1-exp1">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Os preços oficiais da API da Anthropic por milhão de tokens de entrada e de saída, para os modelos atuais.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">É a premissa honesta desta trilha: por token, Fable custa 2x o Opus 5 e 5x o Sonnet 5. Qualquer conversa sobre economia começa aqui.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Token, entrada, saída, $/1M, família de modelos.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-1-exp2">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">2</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">⚖️ Por que "por token" engana</span><p class="text-xs text-neutral-500 mt-0.5">Custo por tarefa concluída</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-1-exp2">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">A unidade que importa é o custo para terminar uma tarefa com qualidade aceitável, incluindo tentativas falhas, retrabalho e turnos extras.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Um pedido mais barato que precisa de mais turnos ou de correção não é mais barato. A tabela de preços não prevê o ranking.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Custo por tarefa, retrabalho, turnos, taxa de acerto.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-1-exp3">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">3</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">🥇 Quando o Fable em esforço baixo vence o barato</span><p class="text-xs text-neutral-500 mt-0.5">Pesquisa profunda: ganhou e custou 10% menos por tarefa</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-1-exp3">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Em medições publicadas pela Anthropic, o Fable 5 em esforço baixo superou o Sonnet 5 num benchmark de pesquisa profunda custando cerca de 10% menos por tarefa.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">É a prova de que o ranking por preço de lista não prevê o ranking por custo real. O modelo mais caro, em esforço baixo, pode ser o mais barato por tarefa.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Esforço baixo, benchmark de pesquisa, cauda de tarefas difíceis.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-1-exp4">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">4</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">🔁 A economia do assinante: parar de repetir</span><p class="text-xs text-neutral-500 mt-0.5">Memória e busca em conversas cortam turnos</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-1-exp4">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Para quem usa o aplicativo (plano fixo), a economia não é em dólares por token: é em cota de uso e tempo. Cada re-explicação de contexto é um turno gasto.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">A maior parte do público do curso paga assinatura, não API. As ferramentas novas de memória e busca em conversas são a alavanca de economia deles.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Cota de uso, turno, re-explicação, memória, busca em conversas.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-1-exp5">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">5</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">🧮 Exercício: três tarefas suas, dois modelos</span><p class="text-xs text-neutral-500 mt-0.5">Uma planilha de duas linhas por tarefa</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-1-exp5">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Estimar o custo de três tarefas reais suas em dois modelos, contando tokens e tentativas, para ver qual sai mais barato por tarefa.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">É o hábito que a trilha quer instalar: nunca decidir modelo pela tabela de preços; decidir pela conta da tarefa.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Estimativa de tokens, tentativas, custo por tarefa, comparação.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-1-exp6">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">6</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">🥈 Onde o mais barato ganha</span><p class="text-xs text-neutral-500 mt-0.5">Código, volume e o que dá para checar</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-1-exp6">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Casos medidos em que o modelo mais barato entregou o mesmo ou quase: Opus 5 empatou com Fable 5 em código a 60% do custo; Haiku a um décimo do custo com acurácia menor.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Uma trilha de economia que só defende o modelo caro não merece confiança. Estes são os casos em que descer de modelo é a decisão certa.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Saturação, subconjunto de código, alto volume, saída checável.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 flex justify-start">
+          <a href="modulo-3-1.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 font-semibold rounded-xl border border-purple-500/30 transition-colors text-sm">Ver Completo →</a>
+        </div>
+      </div>
+    </div>
+    <div id="modulo-3-2" class="bg-dark-800 rounded-2xl border border-dark-600 mb-8 overflow-hidden scroll-mt-20" data-inema-module="3-2">
+      <div class="p-6 border-b border-dark-600">
+        <div class="flex items-start justify-between flex-wrap gap-3 mb-3">
+          <span class="text-purple-400 font-bold text-sm">Módulo 3.2</span>
+          <div class="flex items-center gap-4"><span class="text-neutral-500 text-sm">~45 min</span>
+            <span data-inema-meter="modulo:3-2" class="text-xs text-purple-400 font-semibold"><span data-inema-meter-frac>0 de 6</span></span></div>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">🎚️ Esforço, falhas e a cauda</h2>
+        <p class="text-neutral-400">Esforço (effort) é a primeira alavanca de custo que troca capacidade por dinheiro. Depois vem a política de "rodar barato e refazer só o que falhou". E a lição mais contra-intuitiva: a conta é decidida pelas tarefas difíceis, não pelas típicas.</p>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-neutral-500 mb-4 font-semibold uppercase tracking-wider">Tópicos do módulo</p>
+        <div class="space-y-3 divide-y divide-dark-600">
+          
+          <div class="topic-item pt-3 first:pt-0">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-2-exp1">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">1</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">🎛️ Esforço é o primeiro botão</span><p class="text-xs text-neutral-500 mt-0.5">O que ele controla e por que vem antes do modelo</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-2-exp1">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Um parâmetro (low, medium, high, xhigh, max) que controla quanto o modelo pensa e quantas chamadas de ferramenta faz, sem trocar de modelo.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Troca capacidade por custo dentro do mesmo modelo. Trocar de modelo muda o teto de inteligência; esforço não. Por isso é testado primeiro.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">effort, output_config, profundidade de raciocínio, chamadas de ferramenta.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-2-exp2">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">2</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">📉 Curva plana: pesquisa e conhecimento</span><p class="text-xs text-neutral-500 mt-0.5">Quando descer de nível quase não custa</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-2-exp2">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Em trabalho de pesquisa e conhecimento, as curvas medidas são quase planas: medium igualou o padrão por 70–85% do custo; low perdeu 1 a 3 pontos por um terço a metade do custo.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">É onde a economia é maior e mais segura. Se seu trabalho é ler, resumir, comparar e responder, provavelmente sua curva é essa.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Curva plana, medium, low, 70–85%, um terço a metade.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-2-exp3">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">3</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">📈 Curva íngreme: código longo</span><p class="text-xs text-neutral-500 mt-0.5">Quando cada nível abaixo custa pontos reais</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-2-exp3">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Em código de horizonte longo, a troca é real: no Opus 5, medium perdeu cerca de 2 pontos por metade do custo, e low perdeu cerca de 8 pontos por um quarto.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Saber que a curva é íngreme evita cortar esforço onde isso destrói o resultado. E abre a alternativa do módulo seguinte.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Curva íngreme, 2 pontos por metade, 8 pontos por um quarto, teto de raciocínio.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-2-exp4">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">4</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">♻️ Rode barato e refaça só o que falhou</span><p class="text-xs text-neutral-500 mt-0.5">Mesma taxa de acerto por metade do custo</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-2-exp4">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Uma política: rodar tudo em esforço baixo e refazer no padrão apenas as tarefas que falharam num verificador. Em código, deu 93% de acerto a $0,70 por tarefa contra 91,7% a $1,39 rodando tudo no padrão.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">É o jeito de ter economia mesmo em curva íngreme. Só funciona se você tem um sinal de falha (teste, validador, checador).</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Política de re-execução, sinal de falha, verificador, custo contando as tentativas falhas.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-2-exp5">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">5</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">🦎 Precifique a cauda, não a mediana</span><p class="text-xs text-neutral-500 mt-0.5">Duas tarefas em vinte levaram 43% do gasto</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-2-exp5">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Na tarefa típica todos os modelos parecem iguais e o barato parece melhor. A conta é decidida pelas tarefas difíceis: numa rodada de 20 problemas de pesquisa, 2 carregaram 43% do gasto.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">É a lição mais contra-intuitiva de custo. Quem compara pela mediana escolhe o modelo errado.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Cauda, mediana, 10% mais difíceis, concentração de gasto.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-2-exp6">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">6</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">📏 Regras de medição que evitam decisão errada</span><p class="text-xs text-neutral-500 mt-0.5">Uma alavanca por vez, nunca por uma rodada só</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-2-exp6">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">As disciplinas de medição da guia oficial: varredura com células idênticas exceto o esforço, sessões separadas, tarefa difícil incluída, repetição quando a diferença é pequena, uma alavanca por diff.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Uma medição mal feita é pior que nenhuma: ela dá confiança em algo errado.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Célula idêntica, sessão separada, ruído, repetição, uma alavanca por vez.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 flex justify-start">
+          <a href="modulo-3-2.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 font-semibold rounded-xl border border-purple-500/30 transition-colors text-sm">Ver Completo →</a>
+        </div>
+      </div>
+    </div>
+    <div id="modulo-3-3" class="bg-dark-800 rounded-2xl border border-dark-600 mb-8 overflow-hidden scroll-mt-20" data-inema-module="3-3">
+      <div class="p-6 border-b border-dark-600">
+        <div class="flex items-start justify-between flex-wrap gap-3 mb-3">
+          <span class="text-purple-400 font-bold text-sm">Módulo 3.3</span>
+          <div class="flex items-center gap-4"><span class="text-neutral-500 text-sm">~50 min</span>
+            <span data-inema-meter="modulo:3-3" class="text-xs text-purple-400 font-semibold"><span data-inema-meter-frac>0 de 6</span></span></div>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">🔧 Alavancas do 5.1 para quem usa a API</h2>
+        <p class="text-neutral-400">Módulo opcional para quem programa contra a API. O Fable 5.1 trouxe leitura de cache a um quarto de centavo por mil tokens, troca de esforço sem resetar o cache, orçamento de tarefa e fallbacks. A ordem de aplicação continua a mesma: cache, esforço, orçamento, modelo.</p>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-neutral-500 mb-4 font-semibold uppercase tracking-wider">Tópicos do módulo</p>
+        <div class="space-y-3 divide-y divide-dark-600">
+          
+          <div class="topic-item pt-3 first:pt-0">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-3-exp1">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">1</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">🧭 A ordem das alavancas e o que mudou no 5.1</span><p class="text-xs text-neutral-500 mt-0.5">Cache, esforço, orçamento, modelo, e as novidades</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-3-exp1">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Um mapa das alavancas de custo da API, na ordem em que a guia oficial manda aplicar, marcando o que é novo no Fable 5.1.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Quem aplica fora de ordem não sabe o que ajudou e perde cache no caminho.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Cache de prompt, effort, task_budget, batch, fallbacks, ordem de aplicação.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-3-exp2">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">2</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">🗄️ Cache de prompt: o ganho grátis</span><p class="text-xs text-neutral-500 mt-0.5">Prefixo estável e a leitura a $0,25</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-3-exp2">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Colocar o conteúdo que não muda (prompt de sistema, ferramentas, documentos fixos) no início do pedido e marcar um ponto de cache. No 5.1 a leitura custa $0,25 por milhão.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">É a única alavanca que não troca qualidade por nada. E é a mais fácil de quebrar sem perceber.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Prefixo, cache_control, invalidador silencioso, cache_read_input_tokens.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-3-exp3">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">3</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">🔀 Esforço por mensagem sem resetar o cache</span><p class="text-xs text-neutral-500 mt-0.5">Novidade do 5.1</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-3-exp3">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Uma mensagem de sistema com conteúdo vazio e um novo esforço, inserida no meio da conversa, muda o esforço dali em diante sem invalidar o prefixo cacheado.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Antes, trocar o esforço no topo do pedido resetava o cache. Agora dá para começar alto e baixar quando a tarefa fica rotineira, mantendo o cache.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Mensagem de sistema no array, content vazio, output_config.effort, beta.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-3-exp4">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">4</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">🎯 Orçamento de tarefa</span><p class="text-xs text-neutral-500 mt-0.5">O modelo enxerga o teto e se organiza</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-3-exp4">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">Um teto de tokens para um laço com agentes que o modelo vê durante a geração, diferente do limite duro de saída. Mínimo 20.000. Beta.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Reduz custo com perda controlada: -18% por -2,7 pontos num orçamento folgado; -47% por -4,4 no mais apertado permitido.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">task_budget, advisório, p90, streaming, invalida cache se mudar.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-3-exp5">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">5</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">📦 Lote pela metade e fallbacks</span><p class="text-xs text-neutral-500 mt-0.5">O que não tem pressa e o que pode ser recusado</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-3-exp5">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">O endpoint de lotes processa pedidos sem pressa a 50% do preço. Os fallbacks server-side redirecionam para outro modelo quando o Fable 5.1 recusa por categoria de segurança.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Lote é a maior economia bruta para trabalho assíncrono. Fallback evita código defensivo e mantém a taxa de conclusão.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Batches, custom_id, resultado fora de ordem, stop_reason refusal, fallbacks default.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-item pt-3 ">
+            <button onclick="toggleTopic(this)" class="w-full flex items-center justify-start gap-3 text-left group" aria-expanded="false" aria-controls="t3m3-3-exp6">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">6</span>
+              <div><span class="font-semibold text-neutral-100 group-hover:text-purple-400 transition-colors">📐 Medir na API: o mínimo que funciona</span><p class="text-xs text-neutral-500 mt-0.5">Vinte pedidos, um executor, custo por tarefa</p></div>
+            </button>
+            <div class="topic-explanation mt-4 pl-9" id="t3m3-3-exp6">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">O que é</p><p class="text-sm text-neutral-300">A receita mínima de avaliação para quem programa: pedidos congelados, julgamento barato, executor que grava uso de tokens, e aprovação de custo antes de rodar.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Por que aprender</p><p class="text-sm text-neutral-300">Sem medição, toda alavanca vira aposta. Com vinte pedidos e um roteiro, você tem decisão.</p></div>
+                <div class="bg-dark-700 rounded-xl p-4 border border-dark-600"><p class="text-xs font-semibold text-purple-400 mb-2">Conceitos-chave</p><p class="text-sm text-neutral-300">Eval mínimo, usage, custo por tarefa, uma alavanca por diff.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 flex justify-start">
+          <a href="modulo-3-3.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 font-semibold rounded-xl border border-purple-500/30 transition-colors text-sm">Ver Completo →</a>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-between items-center mt-10 pt-8 border-t border-dark-600 flex-wrap gap-3">
+      <a href="../trilha2/index.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-dark-700 hover:bg-dark-600 text-neutral-300 font-semibold rounded-xl border border-dark-600 transition-colors text-sm">← Trilha 2: Na prática</a>
+      <a href="../../index.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary/10 hover:bg-primary/20 text-primary font-semibold rounded-xl border border-primary/30 transition-colors text-sm">Início do curso →</a>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-dark-600 mt-16 py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm space-y-2">
+      <p>Fable 5.1 na prática · Trilha 3 — Gastar menos · 2026 ·
+        <a href="https://inema.club" target="_blank" class="text-sky-400 hover:text-sky-300">INEMA.CLUB</a> -
+        <a href="https://inema.pro" target="_blank" class="text-amber-700 dark:text-slate-300">PRO</a></p>
+      <p class="text-xs">Fonte do prompt de sistema: <a href="https://platform.claude.com/docs/en/release-notes/system-prompts/claude-fable-5-1" target="_blank" class="text-sky-400 hover:text-sky-300">prompt oficial publicado pela Anthropic</a> ·
+        <a href="https://github.com/elder-plinius/CL4R1T4S/tree/main/ANTHROPIC" target="_blank" class="text-sky-400 hover:text-sky-300">extração pública do runtime completo</a> (não autenticada; congelada em 02/09/2026).</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS núcleo v1 -->
+  <script>
+    function toggleTopic(button) {
+      const topicItem = button.closest('.topic-item');
+      const explanation = topicItem.querySelector('.topic-explanation');
+      const moduleCard = button.closest('.bg-dark-800');
+      if (moduleCard) {
+        moduleCard.querySelectorAll('.topic-explanation.active').forEach(exp => {
+          if (exp !== explanation) { exp.classList.remove('active'); const b = exp.parentElement.querySelector('[aria-controls="' + exp.id + '"]'); if (b) b.setAttribute('aria-expanded', 'false'); }
+        });
+      }
+      const isOpen = explanation.classList.toggle('active');
+      button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+    const html = document.documentElement;
+    if (!html.classList.contains('dark')) { themeToggleDarkIcon.classList.remove('hidden'); } else { themeToggleLightIcon.classList.remove('hidden'); }
+    themeToggle.addEventListener('click', () => {
+      themeToggleDarkIcon.classList.toggle('hidden');
+      themeToggleLightIcon.classList.toggle('hidden');
+      html.classList.toggle('dark');
+      const dark = html.classList.contains('dark');
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+      if (window.INEMA && INEMA.setPref) { try { INEMA.setPref('theme', dark ? 'inema-dark' : 'claro'); } catch (e) {} }
+    });
+    function openModal(modalId) { const m = document.getElementById(modalId); if (m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; } }
+    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden')); document.body.style.overflow = 'auto'; }
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    // Quiz inline (3 perguntas por módulo)
+    document.addEventListener('click', (e) => {
+      const opt = e.target.closest('.qz-opt'); if (!opt) return;
+      const qz = opt.closest('.qz'); if (!qz || qz.hasAttribute('data-answered')) return;
+      const ok = opt.getAttribute('data-ok') === '1';
+      qz.querySelectorAll('.qz-opt').forEach(o => { o.setAttribute('data-state', o.getAttribute('data-ok') === '1' ? 'ok' : (o === opt ? 'no' : '')); o.disabled = true; });
+      qz.setAttribute('data-answered', ok ? 'ok' : 'no');
+      const fb = qz.querySelector('.qz-fb'); if (fb) fb.textContent = (ok ? '✓ Certo. ' : '✗ Não é essa. ') + (fb.getAttribute('data-text') || '');
+    });
+    // Copiar código
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-copy]'); if (!b) return;
+      const pre = b.closest('.codebox').querySelector('pre');
+      navigator.clipboard && navigator.clipboard.writeText(pre.innerText).then(() => { const t = b.textContent; b.textContent = 'Copiado ✓'; setTimeout(() => b.textContent = t, 1600); });
+    });
+  </script>
+
+  <script src="../../assets/learn.js"></script>
+  <script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') { window.INEMA.init(); }
+  </script>
+</body>
+</html>
