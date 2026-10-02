@@ -16,3 +16,11 @@ O material que embasa o curso vive num repositório separado, para ser usado sem
 - `build/` — gerador (`node build/build.mjs`)
 - `doc/` — material-fonte local (não publicado; cópia também em `fable51-system-prompt/doc/`)
 - `PROPOSTA-CURSO.md` — proposta e análise original · `FALHAS.md` — changelog de falhas
+
+<!-- inema-backlink:v1 -->
+## Mais no INEMA.CLUB
+
+- [Ficha completa deste curso](https://www.inema.club/cursos/256-fable-5-1-na-pratica-o-que-mudou-como-usar-como-gastar-menos/)
+- [Guia: como aprender inteligência artificial](https://www.inema.club/aprender-inteligencia-artificial/)
+- [Todos os cursos](https://www.inema.club/cursos/)
+<!-- /inema-backlink:v1 -->
