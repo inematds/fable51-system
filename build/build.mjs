@@ -194,5 +194,7 @@ const landing = head({ rel: '.', title: 'Início', desc: `${COURSE_TITLE}: ${COU
   </main>
 ` + footer({}) + scripts({ rel: '.' });
 
-writeFileSync(out('index.html'), landing);
+// Link de volta pra ficha e pro guia no inema.club (inemaseo, backlinks.py) — fica no build pra não sumir.
+const BACKLINK = '\n<!-- inema-backlink:v1 -->\n<p style="display:block;width:100%;text-align:center;font-size:.85rem;margin:.75rem 0 0;opacity:.85"><a href="https://www.inema.club/cursos/256-fable-5-1-na-pratica-o-que-mudou-como-usar-como-gastar-menos/" style="color:inherit;text-decoration:underline">Ficha completa deste curso no INEMA.CLUB</a> · <a href="https://www.inema.club/aprender-inteligencia-artificial/" style="color:inherit;text-decoration:underline">Guia: como aprender inteligência artificial</a></p>\n<!-- /inema-backlink:v1 -->\n';
+writeFileSync(out('index.html'), landing.replace(/<\/footer>(?![\s\S]*<\/footer>)/, BACKLINK + '</footer>'));
 console.log(`ok: ${totalModules} módulos, ${totalTopics} tópicos, ~${totalMin} min`);
